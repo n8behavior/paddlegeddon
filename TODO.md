@@ -10,13 +10,17 @@
 
 ### 1.2 Basic Pong Implementation
 
+- [ ] level
+  - [ ] Background (mesh)
+  - [ ] Court lines (decals)
+  - [ ] Boundary colliders
 - [ ] Create core components:
   - [ ] `Ball` component with velocity
-  - [ ] `Paddle` component with player assignment
+  - [x] `Paddle` component with player assignment
   - [ ] `Goal` zones for scoring
 - [ ] Create game systems:
   - [ ] Ball physics (movement, edge bouncing)
-  - [ ] Paddle movement (keyboard input)
+  - [x] Paddle movement (keyboard input)
   - [ ] Collision detection (ball-paddle)
   - [ ] Scoring system
 - [ ] Add visual assets:

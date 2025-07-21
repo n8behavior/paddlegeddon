@@ -23,7 +23,7 @@ pub(super) fn plugin(app: &mut App) {
 
     app.add_systems(
         Update,
-        (apply_movement, apply_screen_wrap)
+        (apply_movement, apply_screen_wrap, apply_screen_bound)
             .chain()
             .in_set(AppSystems::Update)
             .in_set(PausableSystems),
@@ -78,5 +78,19 @@ fn apply_screen_wrap(
         let position = transform.translation.xy();
         let wrapped = (position + half_size).rem_euclid(size) - half_size;
         transform.translation = wrapped.extend(transform.translation.z);
+    }
+}
+
+#[derive(Component, Reflect)]
+#[reflect(Component)]
+pub struct ScreenBound;
+
+pub fn apply_screen_bound(
+    window: Single<&Window, With<PrimaryWindow>>,
+    bound_entities: Query<&mut Transform, With<ScreenBound>>,
+) {
+    let bound = window.size().y / 2.0;
+    for mut transform in bound_entities {
+        transform.translation.y = transform.translation.y.clamp(-bound, bound);
     }
 }

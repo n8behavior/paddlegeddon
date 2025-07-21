@@ -5,9 +5,11 @@ use bevy::prelude::*;
 use crate::{
     asset_tracking::LoadResource,
     audio::music,
-    demo::player::{PlayerAssets, player},
+    game::player::{PlayerAssets, player},
     screens::Screen,
 };
+
+use super::player::PlayerSide;
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<LevelAssets>();
@@ -43,7 +45,12 @@ pub fn spawn_level(
         Visibility::default(),
         StateScoped(Screen::Gameplay),
         children![
-            player(400.0, &player_assets, &mut texture_atlas_layouts),
+            player(
+                PlayerSide::Left,
+                400.0,
+                &player_assets,
+                &mut texture_atlas_layouts
+            ),
             (
                 Name::new("Gameplay Music"),
                 music(level_assets.music.clone())
