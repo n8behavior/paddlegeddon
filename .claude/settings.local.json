@@ -3,8 +3,12 @@
     "allow": [
       "Bash(markdownlint-cli2:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(cargo check:*)",
+      "Bash(bevy build:*)"
     ],
-    "deny": []
+    "deny": [
+      "Bash(git push:*)"
+    ]
   }
 }
