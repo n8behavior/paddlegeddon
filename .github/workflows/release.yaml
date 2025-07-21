@@ -163,8 +163,8 @@ jobs:
           echo "app_display_name=${app_display_name:=${app_package_name}}" >> "${GITHUB_ENV}"
           echo "app_short_name=${app_short_name:=${app_display_name}}" >> "${GITHUB_ENV}"
 
-          # Version from job env
-          echo "version=${{ env.version }}" >> "${GITHUB_ENV}"
+          # Version from job needs
+          echo "version=${{ needs.get-version.outputs.version }}" >> "${GITHUB_ENV}"
           
           # File paths:
           echo "app=tmp/app/${app_package_name}"'${{ matrix.app_suffix }}' >> "${GITHUB_ENV}"

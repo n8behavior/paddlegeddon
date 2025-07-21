@@ -9,10 +9,10 @@
       "Bash(gh run list:*)",
       "Bash(gh release list:*)",
       "Bash(git tag:*)",
+      "Bash(git push:*)",
       "Bash(git rev-list:*)"
     ],
     "deny": [
-      "Bash(git push:*)"
     ]
   }
 }
