@@ -8,13 +8,11 @@ use bevy::{
 use crate::{
     AppSystems, PausableSystems,
     asset_tracking::LoadResource,
-    demo::{
-        animation::PlayerAnimation,
-        movement::{MovementController, ScreenWrap},
-    },
+    game::movement::{MovementController, ScreenBound},
 };
 
 pub(super) fn plugin(app: &mut App) {
+    app.register_type::<PlayerSide>();
     app.register_type::<Player>();
 
     app.register_type::<PlayerAssets>();
@@ -29,27 +27,38 @@ pub(super) fn plugin(app: &mut App) {
     );
 }
 
+#[derive(Reflect, Default, Clone, Copy, PartialEq, Eq, Debug)]
+pub enum PlayerSide {
+    #[default]
+    Left,
+    Right,
+}
+
 /// The player character.
 pub fn player(
+    side: PlayerSide,
     max_speed: f32,
-    player_assets: &PlayerAssets,
-    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
+    _player_assets: &PlayerAssets,
+    _texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
 ) -> impl Bundle {
     // A texture atlas is a way to split a single image into a grid of related images.
     // You can learn more in this example: https://github.com/bevyengine/bevy/blob/latest/examples/2d/texture_atlas.rs
-    let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 6, 2, Some(UVec2::splat(1)), None);
-    let texture_atlas_layout = texture_atlas_layouts.add(layout);
-    let player_animation = PlayerAnimation::new();
+    //let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 6, 2, Some(UVec2::splat(1)), None);
+    //let texture_atlas_layout = texture_atlas_layouts.add(layout);
+    //let player_animation = PlayerAnimation::new();
 
     (
         Name::new("Player"),
-        Player,
+        Player { side },
         Sprite {
-            image: player_assets.ducky.clone(),
-            texture_atlas: Some(TextureAtlas {
-                layout: texture_atlas_layout,
-                index: player_animation.get_atlas_index(),
-            }),
+            // Starts with Pong-style paddles that morph later
+            //image: player_assets.ducky.clone(),
+            //texture_atlas: Some(TextureAtlas {
+            //    layout: texture_atlas_layout,
+            //    index: player_animation.get_atlas_index(),
+            //}),
+            color: Color::WHITE,
+            custom_size: Some(Vec2::new(10.0, 40.0)),
             ..default()
         },
         Transform::from_scale(Vec2::splat(8.0).extend(1.0)),
@@ -57,14 +66,16 @@ pub fn player(
             max_speed,
             ..default()
         },
-        ScreenWrap,
-        player_animation,
+        ScreenBound,
+        //player_animation,
     )
 }
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
 #[reflect(Component)]
-struct Player;
+struct Player {
+    side: PlayerSide,
+}
 
 fn record_player_directional_input(
     input: Res<ButtonInput<KeyCode>>,
@@ -78,12 +89,13 @@ fn record_player_directional_input(
     if input.pressed(KeyCode::KeyS) || input.pressed(KeyCode::ArrowDown) {
         intent.y -= 1.0;
     }
-    if input.pressed(KeyCode::KeyA) || input.pressed(KeyCode::ArrowLeft) {
-        intent.x -= 1.0;
-    }
-    if input.pressed(KeyCode::KeyD) || input.pressed(KeyCode::ArrowRight) {
-        intent.x += 1.0;
-    }
+    // only up/down for now
+    //if input.pressed(KeyCode::KeyA) || input.pressed(KeyCode::ArrowLeft) {
+    //    intent.x -= 1.0;
+    //}
+    //if input.pressed(KeyCode::KeyD) || input.pressed(KeyCode::ArrowRight) {
+    //    intent.x += 1.0;
+    //}
 
     // Normalize intent so that diagonal movement is the same speed as horizontal / vertical.
     // This should be omitted if the input comes from an analog stick instead.
