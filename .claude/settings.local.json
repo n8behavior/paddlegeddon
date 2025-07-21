@@ -5,7 +5,9 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(cargo check:*)",
-      "Bash(bevy build:*)"
+      "Bash(bevy build:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh release list:*)"
     ],
     "deny": [
       "Bash(git push:*)"

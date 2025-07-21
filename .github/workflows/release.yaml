@@ -1,12 +1,16 @@
 name: Release
 
 on:
-  # Trigger this workflow on a manual workflow dispatch.
+  # Trigger this workflow on tag pushes matching v*.*.* pattern
+  push:
+    tags:
+      - 'v*.*.*'
+  # Also allow manual workflow dispatch
   workflow_dispatch:
     inputs:
       version:
-        description: "Version number in the format `v1.2.3`"
-        required: true
+        description: "Version number in the format `v1.2.3` (optional when triggered by tag)"
+        required: false
         type: string
       build_for_windows:
         description: "Build for Windows (WARNING: slow!)"
