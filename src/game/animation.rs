@@ -84,7 +84,7 @@ fn trigger_step_sound_effect(
             && animation.changed()
             && (animation.frame == 2 || animation.frame == 5)
         {
-            let rng = &mut rand::thread_rng();
+            let rng = &mut rand::rng();
             let random_step = player_assets.steps.choose(rng).unwrap().clone();
             commands.spawn(sound_effect(random_step));
         }
@@ -131,10 +131,6 @@ impl PlayerAnimation {
             frame: 0,
             state: PlayerAnimationState::Walking,
         }
-    }
-
-    pub fn new() -> Self {
-        Self::idling()
     }
 
     /// Update animation timers.
