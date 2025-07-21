@@ -1,18 +1,17 @@
 {
   "permissions": {
     "allow": [
-      "Bash(markdownlint-cli2:*)",
+      "Bash(bevy build:*)",
+      "Bash(cargo check:*)",
+      "Bash(gh release list:*)",
+      "Bash(gh run list:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(cargo check:*)",
-      "Bash(bevy build:*)",
-      "Bash(gh run list:*)",
-      "Bash(gh release list:*)",
-      "Bash(git tag:*)",
       "Bash(git push:*)",
-      "Bash(git rev-list:*)"
+      "Bash(git rev-list:*)",
+      "Bash(git tag:*)",
+      "Bash(markdownlint-cli2:*)"
     ],
-    "deny": [
-    ]
+    "deny": []
   }
 }
