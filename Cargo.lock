@@ -3369,7 +3369,7 @@ dependencies = [
 
 [[package]]
 name = "paddlegeddon"
-version = "0.0.0"
+version = "0.0.3"
 dependencies = [
  "bevy",
  "getrandom 0.3.3",

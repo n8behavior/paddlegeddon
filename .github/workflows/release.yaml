@@ -175,6 +175,10 @@ jobs:
           if [ '${{ inputs.deny_warnings }}' = 'true' ]; then
             RUSTFLAGS="${RUSTFLAGS:+$RUSTFLAGS }"'-Dwarnings'
           fi
+          # Add getrandom backend configuration for web builds
+          if [ '${{ matrix.platform }}' = 'web' ]; then
+            RUSTFLAGS="${RUSTFLAGS:+$RUSTFLAGS }"'--cfg getrandom_backend="wasm_js"'
+          fi
           echo "RUSTFLAGS=${RUSTFLAGS}" >> "${GITHUB_ENV}"
 
           # macOS environment:
@@ -184,12 +188,17 @@ jobs:
           fi
 
           # Check if building for this platform is enabled.
+          # Default to true when triggered by tag push (inputs are undefined)
           echo 'is_platform_enabled=${{
-            (matrix.platform == 'web' && inputs.build_for_web) ||
-            (matrix.platform == 'linux' && inputs.build_for_linux) ||
-            (matrix.platform == 'windows' && inputs.build_for_windows) ||
-            (matrix.platform == 'macos' && inputs.build_for_macos)
+            (matrix.platform == 'web' && (inputs.build_for_web != false)) ||
+            (matrix.platform == 'linux' && (inputs.build_for_linux != false)) ||
+            (matrix.platform == 'windows' && (inputs.build_for_windows != false)) ||
+            (matrix.platform == 'macos' && (inputs.build_for_macos != false))
           }}' >> "${GITHUB_ENV}"
+          
+          # Set upload flags (default to true when triggered by tag)
+          echo 'upload_to_github=${{ inputs.upload_to_github != false }}' >> "${GITHUB_ENV}"
+          echo 'upload_to_itch=${{ inputs.upload_to_itch != false }}' >> "${GITHUB_ENV}"
 
       - name: Checkout repository
         if: ${{ env.is_platform_enabled == 'true' }}
@@ -231,7 +240,7 @@ jobs:
         run: |
           cargo binstall --locked --no-confirm --force wasm-bindgen-cli
           cargo binstall --locked --no-confirm --force wasm-opt
-          bevy build --locked --release --features='${{ matrix.features }}' --yes web --bundle --cfg 'getrandom_backend="wasm_js"'
+          bevy build --locked --release --features='${{ matrix.features }}' --yes web --bundle
           mv 'target/bevy_web/web-release/${{ env.cargo_build_binary_name }}' '${{ env.app }}'
 
       - name: Build and add binaries to app (non-Web)
@@ -328,7 +337,8 @@ jobs:
       - forward-env
       - get-version
       - build
-    if: ${{ inputs.upload_to_itch && needs.forward-env.outputs.itch_page != '' }}
+    # Only run if itch_page is configured and upload is enabled (default true for tag pushes)
+    if: ${{ needs.forward-env.outputs.itch_page != '' && (github.event_name == 'push' || inputs.upload_to_itch != false) }}
 
     steps:
       - name: Download all packages
