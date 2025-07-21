@@ -7,7 +7,9 @@
       "Bash(cargo check:*)",
       "Bash(bevy build:*)",
       "Bash(gh run list:*)",
-      "Bash(gh release list:*)"
+      "Bash(gh release list:*)",
+      "Bash(git tag:*)",
+      "Bash(git rev-list:*)"
     ],
     "deny": [
       "Bash(git push:*)"

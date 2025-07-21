@@ -190,15 +190,15 @@ jobs:
           # Check if building for this platform is enabled.
           # Default to true when triggered by tag push (inputs are undefined)
           echo 'is_platform_enabled=${{
-            (matrix.platform == 'web' && (inputs.build_for_web != false)) ||
-            (matrix.platform == 'linux' && (inputs.build_for_linux != false)) ||
-            (matrix.platform == 'windows' && (inputs.build_for_windows != false)) ||
-            (matrix.platform == 'macos' && (inputs.build_for_macos != false))
+            (matrix.platform == 'web' && (github.event_name == 'push' || inputs.build_for_web == true)) ||
+            (matrix.platform == 'linux' && (github.event_name == 'push' || inputs.build_for_linux == true)) ||
+            (matrix.platform == 'windows' && (github.event_name == 'push' || inputs.build_for_windows == true)) ||
+            (matrix.platform == 'macos' && (github.event_name == 'push' || inputs.build_for_macos == true))
           }}' >> "${GITHUB_ENV}"
           
           # Set upload flags (default to true when triggered by tag)
-          echo 'upload_to_github=${{ inputs.upload_to_github != false }}' >> "${GITHUB_ENV}"
-          echo 'upload_to_itch=${{ inputs.upload_to_itch != false }}' >> "${GITHUB_ENV}"
+          echo 'upload_to_github=${{ github.event_name == 'push' || inputs.upload_to_github == true }}' >> "${GITHUB_ENV}"
+          echo 'upload_to_itch=${{ github.event_name == 'push' || inputs.upload_to_itch == true }}' >> "${GITHUB_ENV}"
 
       - name: Checkout repository
         if: ${{ env.is_platform_enabled == 'true' }}
@@ -338,7 +338,7 @@ jobs:
       - get-version
       - build
     # Only run if itch_page is configured and upload is enabled (default true for tag pushes)
-    if: ${{ needs.forward-env.outputs.itch_page != '' && (github.event_name == 'push' || inputs.upload_to_itch != false) }}
+    if: ${{ needs.forward-env.outputs.itch_page != '' && (github.event_name == 'push' || inputs.upload_to_itch == true) }}
 
     steps:
       - name: Download all packages
