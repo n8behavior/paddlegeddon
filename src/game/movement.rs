@@ -94,3 +94,58 @@ pub fn apply_screen_bound(
         transform.translation.y = transform.translation.y.clamp(-bound, bound);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use bevy::window::WindowResolution;
+
+    #[test]
+    fn test_screen_bound_clamps_y_position() {
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+
+        // Create a window entity with Window component
+        app.world_mut().spawn((
+            Window {
+                resolution: WindowResolution::new(800.0, 600.0),
+                ..default()
+            },
+            PrimaryWindow,
+        ));
+
+        app.add_systems(Update, apply_screen_bound);
+
+        let enity_above = app
+            .world_mut()
+            .spawn((Transform::from_xyz(0.0, 400.0, 0.0), ScreenBound))
+            .id();
+
+        let enity_below = app
+            .world_mut()
+            .spawn((Transform::from_xyz(0.0, -400.0, 0.0), ScreenBound))
+            .id();
+
+        let enity_inside = app
+            .world_mut()
+            .spawn((Transform::from_xyz(0.0, 100.0, 0.0), ScreenBound))
+            .id();
+
+        app.update();
+
+        let world = app.world();
+
+        assert_eq!(
+            world.get::<Transform>(enity_above).unwrap().translation.y,
+            300.0
+        );
+        assert_eq!(
+            world.get::<Transform>(enity_below).unwrap().translation.y,
+            -300.0
+        );
+        assert_eq!(
+            world.get::<Transform>(enity_inside).unwrap().translation.y,
+            100.0
+        );
+    }
+}

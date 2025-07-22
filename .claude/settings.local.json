@@ -19,7 +19,8 @@
       "Bash(ls:*)",
       "Bash(gh release view:*)",
       "Bash(gh release download:*)",
-      "Bash(unzip:*)"
+      "Bash(unzip:*)",
+      "Bash(cargo test)"
     ],
     "deny": []
   }
