@@ -14,7 +14,12 @@
       "Bash(git push:*)",
       "Bash(git rev-list:*)",
       "Bash(git tag:*)",
-      "Bash(markdownlint-cli2:*)"
+      "Bash(markdownlint-cli2:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(gh release view:*)",
+      "Bash(gh release download:*)",
+      "Bash(unzip:*)"
     ],
     "deny": []
   }
