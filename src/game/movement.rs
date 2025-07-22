@@ -72,6 +72,7 @@ fn apply_screen_wrap(
     window: Single<&Window, With<PrimaryWindow>>,
     mut wrap_query: Query<&mut Transform, With<ScreenWrap>>,
 ) {
+    // FIX: Hardcoded 256 so entity/sprite is completely off screen before wrapping back on
     let size = window.size() + 256.0;
     let half_size = size / 2.0;
     for mut transform in &mut wrap_query {
@@ -99,6 +100,48 @@ pub fn apply_screen_bound(
 mod tests {
     use super::*;
     use bevy::window::WindowResolution;
+
+    #[test]
+    fn test_screen_wrap_translates_y_position() {
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.world_mut().spawn((
+            Window {
+                resolution: WindowResolution::new(800.0, 600.0),
+                ..default()
+            },
+            PrimaryWindow,
+        ));
+        app.add_systems(Update, apply_screen_wrap);
+
+        let should_wrap = app
+            .world_mut()
+            .spawn((Transform::from_xyz(0.0, 428.0, 0.0), ScreenWrap))
+            .id();
+        let should_not_wrap = app
+            .world_mut()
+            .spawn((Transform::from_xyz(0.0, 427.0, 0.0), ScreenWrap))
+            .id();
+
+        app.update();
+
+        assert_eq!(
+            app.world()
+                .get::<Transform>(should_wrap)
+                .unwrap()
+                .translation
+                .y,
+            -428.0
+        );
+        assert_eq!(
+            app.world()
+                .get::<Transform>(should_not_wrap)
+                .unwrap()
+                .translation
+                .y,
+            427.0
+        );
+    }
 
     #[test]
     fn test_screen_bound_clamps_y_position() {
