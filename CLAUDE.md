@@ -9,6 +9,15 @@
     - Most Bundles are deprecated, see [Required Components](https://bevy.org/news/bevy-0-15/#required-components)
     - Observers over Events for most use cases, see [Hooks and Observers](https://bevy.org/news/bevy-0-14/#ecs-hooks-and-observers)
 
+## Technology Constraints
+
+**This is a Rust-only project.**
+
+1. **NO Python, Node.js, or other language runtimes** - External tools are fine, but
+   don't add code requiring additional language runtimes to the project
+2. **Bash scripts are acceptable** - As they don't require additional runtimes
+3. **Use Rust-based solutions** for any code that becomes part of the project
+
 ## Code Quality Requirements
 
 Use the following tools to find errors and warnings

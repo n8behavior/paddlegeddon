@@ -20,7 +20,12 @@
       "Bash(gh release view:*)",
       "Bash(gh release download:*)",
       "Bash(unzip:*)",
-      "Bash(cargo test)"
+      "Bash(cargo test)",
+      "WebFetch(domain:bevy-cheatbook.github.io)",
+      "WebFetch(domain:github.com)",
+      "Bash(bevy lint:*)",
+      "Bash(bevy run:*)",
+      "Bash(bevy:*)"
     ],
     "deny": []
   }
