@@ -58,7 +58,8 @@ fn detect_swipe_gestures(
 
             // Apply movement based on vertical swipe delta
             if delta.y.abs() > 0.1 {
-                let movement_intent = delta.y.signum() * SWIPE_SENSITIVITY;
+                // Screen coords increase down, world increase up
+                let movement_intent = -delta.y.signum() * SWIPE_SENSITIVITY;
 
                 // Apply to all players (in future, could be player-specific based on touch location)
                 for mut controller in &mut controller_query {
@@ -96,4 +97,3 @@ fn detect_swipe_gestures(
         }
     }
 }
-
