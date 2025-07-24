@@ -29,7 +29,9 @@
       "WebFetch(domain:docs.rs)",
       "Bash(timeout:*)",
       "Bash(rustfmt:*)",
-      "Bash(true)"
+      "Bash(true)",
+      "Bash(grep:*)",
+      "Bash(/release)"
     ],
     "deny": []
   }
