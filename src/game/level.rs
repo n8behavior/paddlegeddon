@@ -7,12 +7,10 @@ use crate::{
     audio::music,
     game::{
         court::spawn_court,
-        player::{PlayerAssets, player},
+        player::{self, PlayerAssets, PlayerSide, player},
     },
     screens::Screen,
 };
-
-use super::player::PlayerSide;
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<LevelAssets>();
@@ -45,31 +43,49 @@ pub fn spawn_level(
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     // Spawn the main level entity
-    let level_entity = commands.spawn((
-        Name::new("Level"),
-        Transform::default(),
-        Visibility::default(),
-        StateScoped(Screen::Gameplay),
-    )).id();
-    
+    let level_entity = commands
+        .spawn((
+            Name::new("Level"),
+            Transform::default(),
+            Visibility::default(),
+            StateScoped(Screen::Gameplay),
+        ))
+        .id();
+
     // Spawn court as a child
     let court_entity = spawn_court(&mut commands, &mut meshes, &mut materials);
-    
-    // Spawn player and music
+
+    // Spawn players and music
     let children = vec![
         court_entity,
-        commands.spawn(player(
-            PlayerSide::Left,
-            400.0,
-            &player_assets,
-            &mut texture_atlas_layouts
-        )).id(),
-        commands.spawn((
-            Name::new("Gameplay Music"),
-            music(level_assets.music.clone())
-        )).id(),
+        // Left paddle (player-controlled)
+        commands
+            .spawn(player(
+                PlayerSide::Left,
+                Vec3::new(-player::PADDLE_X_OFFSET, 0.0, 0.0),
+                player::DEFAULT_PADDLE_SPEED,
+                &player_assets,
+                &mut texture_atlas_layouts,
+            ))
+            .id(),
+        // Right paddle (for future AI/PvP)
+        commands
+            .spawn(player(
+                PlayerSide::Right,
+                Vec3::new(player::PADDLE_X_OFFSET, 0.0, 0.0),
+                player::DEFAULT_PADDLE_SPEED,
+                &player_assets,
+                &mut texture_atlas_layouts,
+            ))
+            .id(),
+        commands
+            .spawn((
+                Name::new("Gameplay Music"),
+                music(level_assets.music.clone()),
+            ))
+            .id(),
     ];
-    
+
     // Add all children to the level
     commands.entity(level_entity).add_children(&children);
 }

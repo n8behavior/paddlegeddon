@@ -26,7 +26,8 @@
       "Bash(bevy lint:*)",
       "Bash(bevy run:*)",
       "Bash(bevy:*)",
-      "WebFetch(domain:docs.rs)"
+      "WebFetch(domain:docs.rs)",
+      "Bash(timeout:*)"
     ],
     "deny": []
   }

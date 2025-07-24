@@ -11,6 +11,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_systems(
         Update,
         detect_swipe_gestures
+            .run_if(has_touch_input)
             .in_set(AppSystems::RecordInput)
             .in_set(PausableSystems),
     );
@@ -29,6 +30,11 @@ pub struct TouchGesture {
 // Reserved for future use when implementing discrete swipe gestures
 // const MIN_SWIPE_DISTANCE: f32 = 20.0;
 const SWIPE_SENSITIVITY: f32 = 2.0;
+
+/// Run condition that checks if there are any active touches
+fn has_touch_input(touches: Res<Touches>) -> bool {
+    touches.iter().next().is_some()
+}
 
 fn detect_swipe_gestures(
     touches: Res<Touches>,
