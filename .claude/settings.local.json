@@ -25,7 +25,8 @@
       "WebFetch(domain:github.com)",
       "Bash(bevy lint:*)",
       "Bash(bevy run:*)",
-      "Bash(bevy:*)"
+      "Bash(bevy:*)",
+      "WebFetch(domain:docs.rs)"
     ],
     "deny": []
   }

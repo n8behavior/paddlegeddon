@@ -5,7 +5,10 @@ use bevy::prelude::*;
 use crate::{
     asset_tracking::LoadResource,
     audio::music,
-    game::player::{PlayerAssets, player},
+    game::{
+        court::spawn_court,
+        player::{PlayerAssets, player},
+    },
     screens::Screen,
 };
 
@@ -38,23 +41,35 @@ pub fn spawn_level(
     level_assets: Res<LevelAssets>,
     player_assets: Res<PlayerAssets>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    commands.spawn((
+    // Spawn the main level entity
+    let level_entity = commands.spawn((
         Name::new("Level"),
         Transform::default(),
         Visibility::default(),
         StateScoped(Screen::Gameplay),
-        children![
-            player(
-                PlayerSide::Left,
-                400.0,
-                &player_assets,
-                &mut texture_atlas_layouts
-            ),
-            (
-                Name::new("Gameplay Music"),
-                music(level_assets.music.clone())
-            )
-        ],
-    ));
+    )).id();
+    
+    // Spawn court as a child
+    let court_entity = spawn_court(&mut commands, &mut meshes, &mut materials);
+    
+    // Spawn player and music
+    let children = vec![
+        court_entity,
+        commands.spawn(player(
+            PlayerSide::Left,
+            400.0,
+            &player_assets,
+            &mut texture_atlas_layouts
+        )).id(),
+        commands.spawn((
+            Name::new("Gameplay Music"),
+            music(level_assets.music.clone())
+        )).id(),
+    ];
+    
+    // Add all children to the level
+    commands.entity(level_entity).add_children(&children);
 }
