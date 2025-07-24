@@ -27,7 +27,9 @@
       "Bash(bevy run:*)",
       "Bash(bevy:*)",
       "WebFetch(domain:docs.rs)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(rustfmt:*)",
+      "Bash(true)"
     ],
     "deny": []
   }

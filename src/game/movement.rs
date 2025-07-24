@@ -80,7 +80,6 @@ fn apply_screen_wrap(
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -127,5 +126,4 @@ mod tests {
             427.0
         );
     }
-
 }

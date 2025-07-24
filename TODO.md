@@ -162,3 +162,19 @@
 
 **Starting Point**: Fresh from `bevy new -t=2d` template with demo module intact
 **Next Step**: Begin Phase 1.1 - Create game module structure
+
+## Technical Debt & Deferred Items
+
+### Code marked with `#[allow(dead_code)]`
+
+The following items are intentionally suppressed warnings for future features:
+
+1. **`GameLayer::PowerUp` variant** (src/game/physics.rs) - Will be used in
+   Phase 2 when implementing power-ups
+2. **`ball_layers()` function** (src/game/physics.rs) - Will be used in Phase
+   1.2 when implementing ball physics
+3. **`powerup_layers()` function** (src/game/physics.rs) - Will be used in
+   Phase 2 when implementing power-ups
+
+These items are pre-implemented to establish the collision layer architecture
+early and should not be removed.
