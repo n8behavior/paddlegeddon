@@ -9,9 +9,9 @@ use bevy::{
 use crate::{
     AppSystems, PausableSystems,
     asset_tracking::LoadResource,
+    game::court::COURT_HEIGHT,
     game::movement::MovementController,
     game::physics::{PADDLE_FRICTION, PADDLE_MAX_SPEED, PADDLE_RESTITUTION, paddle_layers},
-    game::court::COURT_HEIGHT,
 };
 
 // Paddle dimensions (relative to court size)
@@ -111,12 +111,22 @@ pub struct Player {
 
 /// Run condition that checks if there's any player movement input
 fn player_input(keyboard: Res<ButtonInput<KeyCode>>) -> bool {
-    keyboard.any_pressed([KeyCode::KeyW, KeyCode::KeyS, KeyCode::ArrowUp, KeyCode::ArrowDown])
+    keyboard.any_pressed([
+        KeyCode::KeyW,
+        KeyCode::KeyS,
+        KeyCode::ArrowUp,
+        KeyCode::ArrowDown,
+    ])
 }
 
 /// Run condition that checks if player movement input was just released
 fn player_input_stopped(keyboard: Res<ButtonInput<KeyCode>>) -> bool {
-    keyboard.any_just_released([KeyCode::KeyW, KeyCode::KeyS, KeyCode::ArrowUp, KeyCode::ArrowDown])
+    keyboard.any_just_released([
+        KeyCode::KeyW,
+        KeyCode::KeyS,
+        KeyCode::ArrowUp,
+        KeyCode::ArrowDown,
+    ])
 }
 
 /// Apply movement to player based on keyboard input
@@ -139,7 +149,7 @@ fn move_player(
             // Normalize intent so that diagonal movement is the same speed as horizontal / vertical.
             // This should be omitted if the input comes from an analog stick instead.
             controller.intent = intent.normalize_or_zero();
-            
+
             break; // Only one left paddle, so we can exit early
         }
     }

@@ -1,7 +1,7 @@
 //! Debug utilities for development builds.
 
-use bevy::prelude::*;
 use avian2d::prelude::*;
+use bevy::prelude::*;
 
 pub(super) fn plugin(app: &mut App) {
     // Only add debug systems in development builds
