@@ -1,23 +1,53 @@
 # Paddlegeddon Development Roadmap
 
+## Technical Considerations
+
+- Use Bevy 0.16.1 features (Required Components, Observers)
+- Maintain modular plugin architecture
+- Keep state management clean and predictable
+- Ensure all systems respect pause state
+- Follow existing code conventions from template
+- Reference demo module patterns for implementation guidance
+
+## Current Status
+
+**Starting Point**: Fresh from `bevy new -t=2d` template with demo module intact
+**Next Step**: Begin Phase 1.1 - Create game module structure
+
+## Technical Debt & Deferred Items
+
+### Code marked with `#[allow(dead_code)]`
+
+The following items are intentionally suppressed warnings for future features:
+
+1. **`GameLayer::PowerUp` variant** (src/game/physics.rs) - Will be used in
+   Phase 2 when implementing power-ups
+2. **`ball_layers()` function** (src/game/physics.rs) - Will be used in Phase
+   1.2 when implementing ball physics
+3. **`powerup_layers()` function** (src/game/physics.rs) - Will be used in
+   Phase 2 when implementing power-ups
+
+These items are pre-implemented to establish the collision layer architecture
+early and should not be removed.
+
 ## Phase 1: Core Pong Foundation
 
 ### 1.1 Setup Game Module
 
-- [ ] Create `game` module alongside `demo` (keep demo as reference)
-- [ ] Add game module to main.rs plugin system
-- [ ] Create initial module structure matching demo's organization
+- [x] Create `game` module alongside `demo` (keep demo as reference)
+- [x] Add game module to main.rs plugin system
+- [x] Create initial module structure matching demo's organization
 
 ### 1.2 Basic Pong Implementation
 
 - [ ] level
-  - [ ] Background (mesh)
-  - [ ] Court lines (decals)
-  - [ ] Boundary colliders
+  - [x] Background (mesh)
+  - [x] Court lines (decals)
+  - [x] Boundary colliders
 - [ ] Create core components:
   - [ ] `Ball` component with velocity
   - [x] `Paddle` component with player assignment
-  - [ ] `Goal` zones for scoring
+  - [x] `Goal` zones for scoring
 - [ ] Create game systems:
   - [ ] Ball physics (movement, edge bouncing)
   - [x] Paddle movement (keyboard input)
@@ -148,33 +178,3 @@
 - [ ] Difficulty curve adjustment
 - [ ] Input responsiveness tuning
 - [ ] Multiplayer lag compensation (if networked)
-
-## Technical Considerations
-
-- Use Bevy 0.16.1 features (Required Components, Observers)
-- Maintain modular plugin architecture
-- Keep state management clean and predictable
-- Ensure all systems respect pause state
-- Follow existing code conventions from template
-- Reference demo module patterns for implementation guidance
-
-## Current Status
-
-**Starting Point**: Fresh from `bevy new -t=2d` template with demo module intact
-**Next Step**: Begin Phase 1.1 - Create game module structure
-
-## Technical Debt & Deferred Items
-
-### Code marked with `#[allow(dead_code)]`
-
-The following items are intentionally suppressed warnings for future features:
-
-1. **`GameLayer::PowerUp` variant** (src/game/physics.rs) - Will be used in
-   Phase 2 when implementing power-ups
-2. **`ball_layers()` function** (src/game/physics.rs) - Will be used in Phase
-   1.2 when implementing ball physics
-3. **`powerup_layers()` function** (src/game/physics.rs) - Will be used in
-   Phase 2 when implementing power-ups
-
-These items are pre-implemented to establish the collision layer architecture
-early and should not be removed.
