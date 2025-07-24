@@ -13,6 +13,7 @@
 //! purposes. If you want to move the player in a smoother way,
 //! consider using a [fixed timestep](https://github.com/bevyengine/bevy/blob/main/examples/movement/physics_in_fixed_timestep.rs).
 
+use avian2d::prelude::*;
 use bevy::{prelude::*, window::PrimaryWindow};
 
 use crate::{AppSystems, PausableSystems};
@@ -23,7 +24,7 @@ pub(super) fn plugin(app: &mut App) {
 
     app.add_systems(
         Update,
-        (apply_movement, apply_screen_wrap, apply_screen_bound)
+        (apply_movement, apply_screen_wrap)
             .chain()
             .in_set(AppSystems::Update)
             .in_set(PausableSystems),
@@ -54,13 +55,10 @@ impl Default for MovementController {
     }
 }
 
-fn apply_movement(
-    time: Res<Time>,
-    mut movement_query: Query<(&MovementController, &mut Transform)>,
-) {
-    for (controller, mut transform) in &mut movement_query {
-        let velocity = controller.max_speed * controller.intent;
-        transform.translation += velocity.extend(0.0) * time.delta_secs();
+fn apply_movement(mut movement_query: Query<(&MovementController, &mut LinearVelocity)>) {
+    for (controller, mut velocity) in &mut movement_query {
+        // Set the linear velocity based on the movement intent
+        velocity.0 = controller.max_speed * controller.intent;
     }
 }
 
@@ -82,19 +80,6 @@ fn apply_screen_wrap(
     }
 }
 
-#[derive(Component, Reflect)]
-#[reflect(Component)]
-pub struct ScreenBound;
-
-pub fn apply_screen_bound(
-    window: Single<&Window, With<PrimaryWindow>>,
-    bound_entities: Query<&mut Transform, With<ScreenBound>>,
-) {
-    let bound = window.size().y / 2.0;
-    for mut transform in bound_entities {
-        transform.translation.y = transform.translation.y.clamp(-bound, bound);
-    }
-}
 
 #[cfg(test)]
 mod tests {
@@ -143,52 +128,4 @@ mod tests {
         );
     }
 
-    #[test]
-    fn test_screen_bound_clamps_y_position() {
-        let mut app = App::new();
-        app.add_plugins(MinimalPlugins);
-
-        // Create a window entity with Window component
-        app.world_mut().spawn((
-            Window {
-                resolution: WindowResolution::new(800.0, 600.0),
-                ..default()
-            },
-            PrimaryWindow,
-        ));
-
-        app.add_systems(Update, apply_screen_bound);
-
-        let enity_above = app
-            .world_mut()
-            .spawn((Transform::from_xyz(0.0, 400.0, 0.0), ScreenBound))
-            .id();
-
-        let enity_below = app
-            .world_mut()
-            .spawn((Transform::from_xyz(0.0, -400.0, 0.0), ScreenBound))
-            .id();
-
-        let enity_inside = app
-            .world_mut()
-            .spawn((Transform::from_xyz(0.0, 100.0, 0.0), ScreenBound))
-            .id();
-
-        app.update();
-
-        let world = app.world();
-
-        assert_eq!(
-            world.get::<Transform>(enity_above).unwrap().translation.y,
-            300.0
-        );
-        assert_eq!(
-            world.get::<Transform>(enity_below).unwrap().translation.y,
-            -300.0
-        );
-        assert_eq!(
-            world.get::<Transform>(enity_inside).unwrap().translation.y,
-            100.0
-        );
-    }
 }
