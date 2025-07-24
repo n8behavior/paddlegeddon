@@ -106,7 +106,7 @@ pub fn player(
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
 #[reflect(Component)]
 pub struct Player {
-    side: PlayerSide,
+    pub side: PlayerSide,
 }
 
 /// Run condition that checks if there's any player movement input
