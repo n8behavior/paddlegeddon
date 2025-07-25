@@ -63,7 +63,6 @@ pub fn spawn_level(
             .spawn(player(
                 PlayerSide::Left,
                 Vec3::new(-player::PADDLE_X_OFFSET, 0.0, 0.0),
-                player::DEFAULT_PADDLE_SPEED,
                 &player_assets,
                 &mut texture_atlas_layouts,
             ))
@@ -73,7 +72,6 @@ pub fn spawn_level(
             .spawn(player(
                 PlayerSide::Right,
                 Vec3::new(player::PADDLE_X_OFFSET, 0.0, 0.0),
-                player::DEFAULT_PADDLE_SPEED,
                 &player_assets,
                 &mut texture_atlas_layouts,
             ))

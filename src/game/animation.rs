@@ -11,7 +11,7 @@ use std::time::Duration;
 use crate::{
     AppSystems, PausableSystems,
     audio::sound_effect,
-    game::{movement::MovementController, player::PlayerAssets},
+    game::player::PlayerAssets,
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -35,22 +35,11 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 /// Update the sprite direction and animation state (idling/walking).
+/// TODO: Re-implement this using action events from bevy_enhanced_input
 fn update_animation_movement(
-    mut player_query: Query<(&MovementController, &mut Sprite, &mut PlayerAnimation)>,
+    mut _player_query: Query<(&mut Sprite, &mut PlayerAnimation)>,
 ) {
-    for (controller, mut sprite, mut animation) in &mut player_query {
-        let dx = controller.intent.x;
-        if dx != 0.0 {
-            sprite.flip_x = dx < 0.0;
-        }
-
-        let animation_state = if controller.intent == Vec2::ZERO {
-            PlayerAnimationState::Idling
-        } else {
-            PlayerAnimationState::Walking
-        };
-        animation.update_state(animation_state);
-    }
+    // Temporarily disabled - needs to be reimplemented with action events
 }
 
 /// Update the animation timer.
