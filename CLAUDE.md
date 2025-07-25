@@ -1,3 +1,5 @@
+# Paddlegeddon Development Guidelines
+
 ## CRITICAL: Always Use Latest Bevy Release
 
 **This project MUST always use the latest stable Bevy release.**
@@ -13,8 +15,9 @@
 
 **This is a Rust-only project.**
 
-1. **NO Python, Node.js, or other language runtimes** - External tools are fine, but
-   don't add code requiring additional language runtimes to the project
+1. **NO Python, Node.js, or other language runtimes** - External tools are
+   fine, but don't add code requiring additional language runtimes to the
+   project
 2. **Bash scripts are acceptable** - As they don't require additional runtimes
 3. **Use Rust-based solutions** for any code that becomes part of the project
 
@@ -30,7 +33,8 @@ Use the following tools to find errors and warnings
 
 ## How to provide assistance
 
-When helping with game development, focus on teaching concepts rather than solving problems
+When helping with game development, focus on teaching concepts rather than
+solving problems
 
 1. **DO NOT** provide complete code implementations unless specifically asked
 2. **DO NOT** modify code directly unless requested
