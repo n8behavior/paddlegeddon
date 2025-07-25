@@ -15,7 +15,7 @@ env:
   RUSTFLAGS: -Dwarnings
   RUSTDOCFLAGS: -Dwarnings
   # Use the same Rust toolchain across jobs so they can share a cache.
-  toolchain: stable
+  toolchain: nightly-2025-06-26
 
 jobs:
   # Check formatting.
@@ -98,13 +98,12 @@ jobs:
     name: Bevy lints
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    continue-on-error: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install Rust toolchain (plus bevy_lint)
-        uses: TheBevyFlock/bevy_cli/bevy_lint@lint-v0.3.0
+        uses: TheBevyFlock/bevy_cli/bevy_lint@main
 
       - name: Restore Rust cache
         id: cache
