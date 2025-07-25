@@ -31,7 +31,10 @@
       "Bash(rustfmt:*)",
       "Bash(true)",
       "Bash(grep:*)",
-      "Bash(/release)"
+      "Bash(/release)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(rustc:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }

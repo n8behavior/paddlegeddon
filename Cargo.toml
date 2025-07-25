@@ -6,6 +6,7 @@ edition = "2024"
 
 [dependencies]
 bevy = { version = "0.16", features = ["wayland"] }
+bevy_enhanced_input = "0.15"
 avian2d = "0.3"
 rand = "0.9"
 # Compile low-severity logs out of native builds for performance.

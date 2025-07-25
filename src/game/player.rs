@@ -6,11 +6,11 @@ use bevy::{
     prelude::*,
 };
 
+use bevy_enhanced_input::prelude::*;
+
 use crate::{
-    AppSystems, PausableSystems,
     asset_tracking::LoadResource,
     game::court::COURT_HEIGHT,
-    game::movement::MovementController,
     game::physics::{PADDLE_FRICTION, PADDLE_MAX_SPEED, PADDLE_RESTITUTION, paddle_layers},
 };
 
@@ -28,16 +28,10 @@ pub(super) fn plugin(app: &mut App) {
     app.register_type::<PlayerAssets>();
     app.load_resource::<PlayerAssets>();
 
-    // Player movement systems
-    app.add_systems(
-        Update,
-        (
-            move_player.run_if(player_input),
-            stop_player_movement.run_if(player_input_stopped),
-        )
-            .in_set(AppSystems::RecordInput)
-            .in_set(PausableSystems),
-    );
+    // Input handling
+    app.add_plugins(EnhancedInputPlugin)
+        .add_input_context::<Gameplay>()
+        .add_observer(move_player);
 }
 
 #[derive(Reflect, Default, Clone, Copy, PartialEq, Eq, Debug)]
@@ -47,14 +41,19 @@ pub enum PlayerSide {
     Right,
 }
 
-/// Default paddle speed when not specified
-pub const DEFAULT_PADDLE_SPEED: f32 = PADDLE_MAX_SPEED;
+/// Movement action for players - outputs Vec2 for full 2D movement
+#[derive(Debug, InputAction)]
+#[action_output(Vec2)]
+pub struct Move;
+
+/// Context for active gameplay (as opposed to menus)
+#[derive(Component, Default)]
+pub struct Gameplay;
 
 /// The player character.
 pub fn player(
     side: PlayerSide,
     position: Vec3,
-    max_speed: f32,
     _player_assets: &PlayerAssets,
     _texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
 ) -> impl Bundle {
@@ -66,9 +65,18 @@ pub fn player(
 
     let paddle_height = COURT_HEIGHT * PADDLE_HEIGHT_RATIO;
 
+    // Create actions for both paddles (observer will filter by side)
+    let actions = actions!(Gameplay[
+        (
+            Action::<Move>::new(),
+            Bindings::spawn(Cardinal::wasd_keys()),
+        ),
+    ]);
+
     (
         Name::new("Player"),
         Player { side },
+        Gameplay,  // Add the context component
         Sprite {
             // Starts with Pong-style paddles that morph later
             //image: player_assets.ducky.clone(),
@@ -81,10 +89,7 @@ pub fn player(
             ..default()
         },
         Transform::from_translation(position),
-        MovementController {
-            max_speed,
-            ..default()
-        },
+        actions,
         // Physics components for paddle
         RigidBody::Dynamic,
         Collider::rectangle(PADDLE_WIDTH, paddle_height),
@@ -107,63 +112,6 @@ pub fn player(
 #[reflect(Component)]
 pub struct Player {
     pub side: PlayerSide,
-}
-
-/// Run condition that checks if there's any player movement input
-fn player_input(keyboard: Res<ButtonInput<KeyCode>>) -> bool {
-    keyboard.any_pressed([
-        KeyCode::KeyW,
-        KeyCode::KeyS,
-        KeyCode::ArrowUp,
-        KeyCode::ArrowDown,
-    ])
-}
-
-/// Run condition that checks if player movement input was just released
-fn player_input_stopped(keyboard: Res<ButtonInput<KeyCode>>) -> bool {
-    keyboard.any_just_released([
-        KeyCode::KeyW,
-        KeyCode::KeyS,
-        KeyCode::ArrowUp,
-        KeyCode::ArrowDown,
-    ])
-}
-
-/// Apply movement to player based on keyboard input
-fn move_player(
-    input: Res<ButtonInput<KeyCode>>,
-    mut controller_query: Query<(&Player, &mut MovementController)>,
-) {
-    // Apply movement intent only to left paddle.
-    for (player, mut controller) in &mut controller_query {
-        if player.side == PlayerSide::Left {
-            // Collect directional input.
-            let mut intent = Vec2::ZERO;
-            if input.pressed(KeyCode::KeyW) || input.pressed(KeyCode::ArrowUp) {
-                intent.y += 1.0;
-            }
-            if input.pressed(KeyCode::KeyS) || input.pressed(KeyCode::ArrowDown) {
-                intent.y -= 1.0;
-            }
-
-            // Normalize intent so that diagonal movement is the same speed as horizontal / vertical.
-            // This should be omitted if the input comes from an analog stick instead.
-            controller.intent = intent.normalize_or_zero();
-
-            break; // Only one left paddle, so we can exit early
-        }
-    }
-}
-
-/// Stop player movement when input is released
-fn stop_player_movement(mut controller_query: Query<(&Player, &mut MovementController)>) {
-    // Clear movement intent for left paddle
-    for (player, mut controller) in &mut controller_query {
-        if player.side == PlayerSide::Left {
-            controller.intent = Vec2::ZERO;
-            break; // Only one left paddle, so we can exit early
-        }
-    }
 }
 
 #[derive(Resource, Asset, Clone, Reflect)]
@@ -192,6 +140,17 @@ impl FromWorld for PlayerAssets {
                 assets.load("audio/sound_effects/step3.ogg"),
                 assets.load("audio/sound_effects/step4.ogg"),
             ],
+        }
+    }
+}
+
+/// Apply movement when Move action is fired
+fn move_player(trigger: Trigger<Fired<Move>>, mut paddles: Query<(&Player, &mut LinearVelocity)>) {
+    if let Ok((player, mut velocity)) = paddles.get_mut(trigger.target()) {
+        // Only move left paddle for now
+        if player.side == PlayerSide::Left {
+            // Only use the y component of the movement vector
+            velocity.y = trigger.value.y * PADDLE_MAX_SPEED;
         }
     }
 }
