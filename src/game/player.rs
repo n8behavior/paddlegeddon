@@ -76,7 +76,7 @@ pub fn player(
     (
         Name::new("Player"),
         Player { side },
-        Gameplay,  // Add the context component
+        Gameplay, // Add the context component
         Sprite {
             // Starts with Pong-style paddles that morph later
             //image: player_assets.ducky.clone(),
