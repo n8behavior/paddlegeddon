@@ -8,11 +8,7 @@ use bevy::prelude::*;
 use rand::prelude::*;
 use std::time::Duration;
 
-use crate::{
-    AppSystems, PausableSystems,
-    audio::sound_effect,
-    game::player::PlayerAssets,
-};
+use crate::{AppSystems, PausableSystems, audio::sound_effect, game::player::PlayerAssets};
 
 pub(super) fn plugin(app: &mut App) {
     // Animate and play sound effects based on controls.
@@ -36,9 +32,7 @@ pub(super) fn plugin(app: &mut App) {
 
 /// Update the sprite direction and animation state (idling/walking).
 /// TODO: Re-implement this using action events from bevy_enhanced_input
-fn update_animation_movement(
-    mut _player_query: Query<(&mut Sprite, &mut PlayerAnimation)>,
-) {
+fn update_animation_movement(mut _player_query: Query<(&mut Sprite, &mut PlayerAnimation)>) {
     // Temporarily disabled - needs to be reimplemented with action events
 }
 
