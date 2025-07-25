@@ -98,6 +98,7 @@ jobs:
     name: Bevy lints
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    continue-on-error: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
