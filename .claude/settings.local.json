@@ -36,7 +36,8 @@
       "Bash(rustc:*)",
       "Bash(rm:*)",
       "Bash(cargo:*)",
-      "Bash(/tmp/release.sh:*)"
+      "Bash(/tmp/release.sh:*)",
+      "Bash(sed -n '/^```bash$/,/^```$/p' .claude/commands/release.md | sed '1d;$d' > /tmp/release.sh && chmod +x /tmp/release.sh)"
     ],
     "deny": []
   }
