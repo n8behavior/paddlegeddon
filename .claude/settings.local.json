@@ -34,7 +34,8 @@
       "Bash(/release)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(rustc:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(cargo:*)"
     ],
     "deny": []
   }

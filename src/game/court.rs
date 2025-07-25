@@ -157,7 +157,7 @@ fn spawn_center_line(
         let y = start_y - (i as f32 * pattern_height);
         let dash_entity = commands
             .spawn((
-                Name::new(format!("Dash {}", i)),
+                Name::new(format!("Dash {i}")),
                 Mesh2d(dash_mesh.clone()),
                 MeshMaterial2d(material.clone()),
                 Transform::from_xyz(0.0, y, 0.0),
@@ -183,7 +183,7 @@ fn spawn_goal(commands: &mut Commands, goal: Goal) -> Entity {
 
     commands
         .spawn((
-            Name::new(format!("{:?} Goal", goal)),
+            Name::new(format!("{goal:?} Goal")),
             goal,
             // Sensor collider - doesn't physically block but detects overlaps
             Sensor,

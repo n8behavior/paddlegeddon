@@ -96,6 +96,7 @@ pub enum PlayerAnimationState {
     Walking,
 }
 
+#[allow(dead_code)] // TODO: Remove when animation is reimplemented with input actions
 impl PlayerAnimation {
     /// The number of idle frames.
     const IDLE_FRAMES: usize = 2;
