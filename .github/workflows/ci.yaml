@@ -11,11 +11,11 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # Reduce compile time and cache size.
-  RUSTFLAGS: -Dwarnings -Zshare-generics=y -Zthreads=0
-  RUSTDOCFLAGS: -Dwarnings -Zshare-generics=y -Zthreads=0
+  # Treat warnings as errors.
+  RUSTFLAGS: -Dwarnings
+  RUSTDOCFLAGS: -Dwarnings
   # Use the same Rust toolchain across jobs so they can share a cache.
-  toolchain: nightly-2025-04-03
+  toolchain: stable
 
 jobs:
   # Check formatting.
@@ -129,14 +129,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up environment
-        run: echo "RUSTFLAGS=${RUSTFLAGS:+$RUSTFLAGS }-Zcodegen-backend=cranelift" >> "${GITHUB_ENV}"
-
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ env.toolchain }}
-          components: rustc-codegen-cranelift-preview
 
       - name: Restore Rust cache
         uses: Swatinem/rust-cache@v2
