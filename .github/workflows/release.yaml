@@ -208,8 +208,9 @@ jobs:
 
       - name: Install Rust toolchain
         if: ${{ env.is_platform_enabled == 'true' }}
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@nightly
         with:
+          toolchain: nightly-2025-06-26
           targets: ${{ matrix.targets }}
 
       - name: Restore Rust cache
