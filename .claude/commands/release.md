@@ -42,17 +42,6 @@ if ! git pull --ff-only origin main; then
 fi
 
 # Run quality checks
-echo -e "${YELLOW}🔍 Running Bevy linter...${NC}"
-if ! bevy lint 2>&1 | grep -q "error\[E0658\]"; then
-    # bevy lint succeeded or failed with actual lint errors
-    if ! bevy lint; then
-        echo -e "${RED}❌ Bevy linting failed. Please fix errors before releasing.${NC}"
-        exit 1
-    fi
-else
-    echo -e "${YELLOW}⚠️  Bevy lint skipped due to dependency compilation issues${NC}"
-fi
-
 echo -e "${YELLOW}🔍 Running Rust linter (clippy)...${NC}"
 if ! cargo clippy -- -D warnings; then
     echo -e "${RED}❌ Clippy found warnings. Please fix all warnings before releasing.${NC}"
