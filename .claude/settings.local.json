@@ -38,7 +38,8 @@
       "Bash(cargo:*)",
       "Bash(/tmp/release.sh:*)",
       "Bash(sed:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(.claude/scripts/release.sh:*)"
     ],
     "deny": []
   }
