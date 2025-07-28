@@ -187,7 +187,7 @@ fn spawn_goal(commands: &mut Commands, goal: Goal) -> Entity {
         Goal::Right => COURT_WIDTH / 2.0 - GOAL_WIDTH / 2.0,
     };
 
-    let goal_side = goal.clone();
+    let goal_side = goal;
     commands
         .spawn((
             Name::new(format!("{goal:?} Goal")),
