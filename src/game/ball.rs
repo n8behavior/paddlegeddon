@@ -28,7 +28,7 @@ pub(super) fn plugin(app: &mut App) {
 pub struct Ball;
 
 /// Spawns a ball entity at the center of the court
-pub fn spawn_ball(
+pub(super) fn spawn_ball(
     commands: &mut Commands,
     meshes: &mut ResMut<Assets<Mesh>>,
     materials: &mut ResMut<Assets<ColorMaterial>>,
@@ -56,6 +56,8 @@ pub fn spawn_ball(
             LinearVelocity::ZERO,
             // Enable transform interpolation for smooth visual movement
             TransformInterpolation,
+            // Enable collision events for goal detection
+            CollisionEventsEnabled,
         ))
         .id();
 

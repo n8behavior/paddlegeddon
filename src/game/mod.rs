@@ -7,6 +7,7 @@ mod debug;
 pub mod level;
 mod physics;
 pub mod player;
+mod scoring;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins((
@@ -16,5 +17,6 @@ pub(super) fn plugin(app: &mut App) {
         debug::plugin,
         level::plugin,
         player::plugin,
+        scoring::plugin,
     ));
 }
