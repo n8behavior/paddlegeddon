@@ -4,8 +4,8 @@ use avian2d::prelude::*;
 use bevy::prelude::*;
 
 use super::{
-    physics::{BOUNDARY_FRICTION, BOUNDARY_RESTITUTION, boundary_layers, goal_layers},
     ball::Ball,
+    physics::{BOUNDARY_FRICTION, BOUNDARY_RESTITUTION, boundary_layers, goal_layers},
     player::PlayerSide,
     scoring::GoalScored,
 };
@@ -200,25 +200,30 @@ fn spawn_goal(commands: &mut Commands, goal: Goal) -> Entity {
             // Enable collision events for observer-based detection
             CollisionEventsEnabled,
         ))
-        .observe(move |trigger: Trigger<OnCollisionStart>, 
-                       mut commands: Commands,
-                       ball_query: Query<&Ball>| {
-            let other_entity = trigger.event().collider;
-            
-            // Check if the colliding entity is a ball
-            if ball_query.contains(other_entity) {
-                // Determine which side scores based on which goal was hit
-                let scoring_side = match goal_side {
-                    Goal::Left => PlayerSide::Right,  // Ball in left goal = right player scores
-                    Goal::Right => PlayerSide::Left,  // Ball in right goal = left player scores
-                };
-                
-                info!("Goal detected! {} scores", match scoring_side {
-                    PlayerSide::Left => "Left player",
-                    PlayerSide::Right => "Right player",
-                });
-                commands.trigger(GoalScored { side: scoring_side });
-            }
-        })
+        .observe(
+            move |trigger: Trigger<OnCollisionStart>,
+                  mut commands: Commands,
+                  ball_query: Query<&Ball>| {
+                let other_entity = trigger.event().collider;
+
+                // Check if the colliding entity is a ball
+                if ball_query.contains(other_entity) {
+                    // Determine which side scores based on which goal was hit
+                    let scoring_side = match goal_side {
+                        Goal::Left => PlayerSide::Right, // Ball in left goal = right player scores
+                        Goal::Right => PlayerSide::Left, // Ball in right goal = left player scores
+                    };
+
+                    info!(
+                        "Goal detected! {} scores",
+                        match scoring_side {
+                            PlayerSide::Left => "Left player",
+                            PlayerSide::Right => "Right player",
+                        }
+                    );
+                    commands.trigger(GoalScored { side: scoring_side });
+                }
+            },
+        )
         .id()
 }
