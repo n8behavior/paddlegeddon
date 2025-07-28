@@ -6,6 +6,7 @@ use crate::{
     asset_tracking::LoadResource,
     audio::music,
     game::{
+        ball::spawn_ball,
         court::spawn_court,
         player::{self, PlayerAssets, PlayerSide, player},
     },
@@ -55,7 +56,7 @@ pub fn spawn_level(
     // Spawn court as a child
     let court_entity = spawn_court(&mut commands, &mut meshes, &mut materials);
 
-    // Spawn players and music
+    // Spawn players, ball, and music
     let children = vec![
         court_entity,
         // Left paddle (player-controlled)
@@ -76,6 +77,8 @@ pub fn spawn_level(
                 &mut texture_atlas_layouts,
             ))
             .id(),
+        // Ball
+        spawn_ball(&mut commands, &mut meshes, &mut materials),
         commands
             .spawn((
                 Name::new("Gameplay Music"),
