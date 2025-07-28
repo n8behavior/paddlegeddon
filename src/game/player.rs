@@ -50,6 +50,21 @@ pub struct Move;
 #[derive(Component, Default)]
 pub struct Gameplay;
 
+/// Bundle for core physics components
+#[derive(Bundle)]
+pub struct PhysicsBundle {
+    rigid_body: RigidBody,
+    collider: Collider,
+    layers: CollisionLayers,
+    velocity: LinearVelocity,
+    locked_axes: LockedAxes,
+    gravity_scale: GravityScale,
+    damping: LinearDamping,
+    friction: Friction,
+    restitution: Restitution,
+    interpolation: TransformInterpolation,
+}
+
 /// The player character.
 pub fn player(
     side: PlayerSide,
@@ -89,21 +104,26 @@ pub fn player(
             ..default()
         },
         Transform::from_translation(position),
+        // Physics components bundled together
+        PhysicsBundle {
+            rigid_body: RigidBody::Dynamic,
+            collider: Collider::rectangle(PADDLE_WIDTH, paddle_height),
+            layers: paddle_layers(),
+            velocity: LinearVelocity::default(),
+            // Lock rotation and horizontal movement
+            locked_axes: LockedAxes::new().lock_rotation().lock_translation_x(),
+            // Prevent gravity from affecting the paddle
+            gravity_scale: GravityScale(0.0),
+            // High linear damping to stop quickly when no input
+            damping: LinearDamping(10.0),
+            // Physics material properties for paddles
+            friction: Friction::new(PADDLE_FRICTION),
+            restitution: Restitution::new(PADDLE_RESTITUTION),
+            // Enable transform interpolation for smooth visual movement
+            interpolation: TransformInterpolation,
+        },
+        // Input actions
         actions,
-        // Physics components for paddle
-        RigidBody::Dynamic,
-        Collider::rectangle(PADDLE_WIDTH, paddle_height),
-        paddle_layers(),
-        LinearVelocity::default(),
-        // Lock rotation and horizontal movement
-        LockedAxes::new().lock_rotation().lock_translation_x(),
-        // Prevent gravity from affecting the paddle
-        GravityScale(0.0),
-        // High linear damping to stop quickly when no input
-        LinearDamping(10.0),
-        // Physics material properties for paddles
-        Friction::new(PADDLE_FRICTION),
-        Restitution::new(PADDLE_RESTITUTION),
         //player_animation,
     )
 }
