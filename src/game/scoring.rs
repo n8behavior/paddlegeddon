@@ -117,7 +117,6 @@ fn setup_score_ui(mut commands: Commands) {
     ));
 }
 
-
 /// Updates the score display UI
 fn update_score_display(score: Res<Score>, mut query: Query<(&mut Text, &ScoreDisplay)>) {
     if !score.is_changed() {
@@ -143,16 +142,22 @@ fn handle_goal_and_check_win(
     mut next_state: ResMut<NextState<Screen>>,
 ) {
     let goal_event = trigger.event();
-    
+
     // Update score based on which side scored
     match goal_event.side {
         PlayerSide::Left => {
             score.left += 1;
-            info!("Left player scores! Score: {} - {}", score.left, score.right);
+            info!(
+                "Left player scores! Score: {} - {}",
+                score.left, score.right
+            );
         }
         PlayerSide::Right => {
             score.right += 1;
-            info!("Right player scores! Score: {} - {}", score.left, score.right);
+            info!(
+                "Right player scores! Score: {} - {}",
+                score.left, score.right
+            );
         }
     }
 
@@ -171,7 +176,7 @@ fn handle_goal_and_check_win(
             "{} for {:?}! Final score: {} - {}",
             win_type, winner, score.left, score.right
         );
-        
+
         // Despawn all balls before transitioning
         for ball_entity in &balls {
             commands.entity(ball_entity).despawn();
@@ -185,7 +190,7 @@ fn handle_goal_and_check_win(
         for ball_entity in &balls {
             commands.entity(ball_entity).despawn();
         }
-        
+
         spawn_ball(&mut commands, &mut meshes, &mut materials);
     }
 }

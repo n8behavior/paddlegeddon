@@ -73,10 +73,10 @@ fn serve_ball(commands: &mut Commands, ball_entity: Entity) {
 
     // Random angle within safe range
     let angle_degrees = rng.random_range(MIN_SERVE_ANGLE..=MAX_SERVE_ANGLE);
-    
+
     // Randomly choose up or down
     let angle_sign = if rng.random_bool(0.5) { 1.0 } else { -1.0 };
-    
+
     // Randomly choose left or right
     let direction_x = if rng.random_bool(0.5) { 1.0 } else { -1.0 };
 
