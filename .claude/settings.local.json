@@ -38,7 +38,9 @@
       "WebFetch(domain:bevy-cheatbook.github.io)",
       "WebFetch(domain:docs.rs)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(cat:*)",
+      "Bash(bash:*)"
     ],
     "deny": []
   }
