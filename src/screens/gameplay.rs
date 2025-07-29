@@ -2,10 +2,10 @@
 
 use bevy::{input::common_conditions::input_just_pressed, prelude::*, ui::Val::*};
 
-use crate::{Pause, game::level::spawn_level, menus::Menu, screens::Screen};
+use crate::{Pause, game::{level::spawn_level, GamePhase, ball::ServeDirection}, menus::Menu, screens::Screen};
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_systems(OnEnter(Screen::Gameplay), spawn_level);
+    app.add_systems(OnEnter(Screen::Gameplay), (spawn_level, reset_game_phase));
 
     // Toggle pause on key press.
     app.add_systems(
@@ -58,4 +58,12 @@ fn open_pause_menu(mut next_menu: ResMut<NextState<Menu>>) {
 
 fn close_menu(mut next_menu: ResMut<NextState<Menu>>) {
     next_menu.set(Menu::None);
+}
+
+fn reset_game_phase(
+    mut game_phase: ResMut<NextState<GamePhase>>,
+    mut serve_direction: ResMut<ServeDirection>,
+) {
+    game_phase.set(GamePhase::WaitingToServe);
+    serve_direction.side = None; // Random serve for first serve
 }
