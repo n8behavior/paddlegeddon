@@ -9,9 +9,11 @@ mod physics;
 pub mod player;
 mod scoring;
 
+use crate::screens::Screen;
+
 pub(super) fn plugin(app: &mut App) {
-    // Initialize game phase state
-    app.init_state::<GamePhase>();
+    // Add GamePhase as a sub-state of Screen::Gameplay
+    app.add_sub_state::<GamePhase>();
     
     app.add_plugins((
         animation::plugin,
@@ -25,8 +27,8 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 /// Sub-states for different phases of gameplay
-#[derive(States, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
-#[states(scoped_entities)]
+#[derive(SubStates, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
+#[source(Screen = Screen::Gameplay)]
 pub enum GamePhase {
     #[default]
     WaitingToServe,  // Waiting for player to press space
