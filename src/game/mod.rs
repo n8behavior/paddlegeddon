@@ -14,7 +14,7 @@ use crate::screens::Screen;
 pub(super) fn plugin(app: &mut App) {
     // Add GamePhase as a sub-state of Screen::Gameplay
     app.add_sub_state::<GamePhase>();
-    
+
     app.add_plugins((
         animation::plugin,
         ball::plugin,
@@ -31,8 +31,8 @@ pub(super) fn plugin(app: &mut App) {
 #[source(Screen = Screen::Gameplay)]
 pub enum GamePhase {
     #[default]
-    WaitingToServe,  // Waiting for player to press space
-    Playing,         // Ball is in play
-    GoalScored,      // Brief pause after goal
-    GameOver,        // Show winner, wait for input
+    WaitingToServe, // Waiting for player to press space
+    Playing,    // Ball is in play
+    GoalScored, // Brief pause after goal
+    GameOver,   // Show winner, wait for input
 }

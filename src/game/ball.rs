@@ -4,11 +4,7 @@ use avian2d::prelude::*;
 use bevy::prelude::*;
 use rand::prelude::*;
 
-use super::{
-    physics::ball_layers,
-    player::PlayerSide,
-    GamePhase,
-};
+use super::{GamePhase, physics::ball_layers, player::PlayerSide};
 use crate::screens::Screen;
 
 // Ball properties
@@ -29,20 +25,15 @@ pub(super) fn plugin(app: &mut App) {
         .init_resource::<ServeDirection>()
         .add_systems(
             Update,
-            handle_serve_input.run_if(in_state(GamePhase::WaitingToServe).and(in_state(Screen::Gameplay))),
+            handle_serve_input
+                .run_if(in_state(GamePhase::WaitingToServe).and(in_state(Screen::Gameplay))),
         )
         .add_systems(
-            OnEnter(GamePhase::WaitingToServe), 
-            setup_serve_ui.run_if(in_state(Screen::Gameplay))
+            OnEnter(GamePhase::WaitingToServe),
+            setup_serve_ui.run_if(in_state(Screen::Gameplay)),
         )
-        .add_systems(
-            OnExit(GamePhase::WaitingToServe),
-            despawn_serve_ui
-        )
-        .add_systems(
-            OnEnter(GamePhase::Playing),
-            serve_on_play_start
-        );
+        .add_systems(OnExit(GamePhase::WaitingToServe), despawn_serve_ui)
+        .add_systems(OnEnter(GamePhase::Playing), serve_on_play_start);
 }
 
 /// Marker component for the ball entity
@@ -60,7 +51,6 @@ pub struct ServeUI;
 pub struct ServeDirection {
     pub side: PlayerSide,
 }
-
 
 /// Spawns a ball entity at the center of the court (without serving)
 pub(super) fn spawn_ball(
@@ -97,15 +87,14 @@ pub(super) fn spawn_ball(
             CollisionEventsEnabled,
         ))
         .id();
-    
+
     // Add damping components separately to avoid tuple size limit
-    commands.entity(ball_entity)
-        .insert((
-            LinearDamping(0.0),
-            AngularDamping(0.0),
-            StateScoped(Screen::Gameplay),
-        ));
-    
+    commands.entity(ball_entity).insert((
+        LinearDamping(0.0),
+        AngularDamping(0.0),
+        StateScoped(Screen::Gameplay),
+    ));
+
     ball_entity
 }
 
@@ -162,61 +151,55 @@ fn handle_serve_input(
     }
 }
 
-
 /// Sets up the serve UI
-fn setup_serve_ui(
-    mut commands: Commands,
-    serve_direction: Res<ServeDirection>,
-) {
+fn setup_serve_ui(mut commands: Commands, serve_direction: Res<ServeDirection>) {
     // Main container
-    commands.spawn((
-        Name::new("Serve UI"),
-        ServeUI,
-        Node {
-            width: Val::Percent(100.0),
-            height: Val::Percent(100.0),
-            justify_content: JustifyContent::Center,
-            align_items: AlignItems::Center,
-            flex_direction: FlexDirection::Column,
-            row_gap: Val::Px(20.0),
-            ..default()
-        },
-        BackgroundColor(Color::NONE),
-    ))
-    .with_children(|parent| {
-        // Serve direction indicator
-        parent.spawn((
-            Text::new(format!(
-                "{} player to serve",
-                match serve_direction.side {
-                    PlayerSide::Left => "Left",
-                    PlayerSide::Right => "Right",
-                }
-            )),
-            TextFont {
-                font_size: 32.0,
+    commands
+        .spawn((
+            Name::new("Serve UI"),
+            ServeUI,
+            Node {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                justify_content: JustifyContent::Center,
+                align_items: AlignItems::Center,
+                flex_direction: FlexDirection::Column,
+                row_gap: Val::Px(20.0),
                 ..default()
             },
-            TextColor(Color::WHITE),
-        ));
-        
-        // Instructions
-        parent.spawn((
-            Text::new("Press SPACE to serve"),
-            TextFont {
-                font_size: 24.0,
-                ..default()
-            },
-            TextColor(Color::srgb(0.8, 0.8, 0.8)),
-        ));
-    });
+            BackgroundColor(Color::NONE),
+        ))
+        .with_children(|parent| {
+            // Serve direction indicator
+            parent.spawn((
+                Text::new(format!(
+                    "{} player to serve",
+                    match serve_direction.side {
+                        PlayerSide::Left => "Left",
+                        PlayerSide::Right => "Right",
+                    }
+                )),
+                TextFont {
+                    font_size: 32.0,
+                    ..default()
+                },
+                TextColor(Color::WHITE),
+            ));
+
+            // Instructions
+            parent.spawn((
+                Text::new("Press SPACE to serve"),
+                TextFont {
+                    font_size: 24.0,
+                    ..default()
+                },
+                TextColor(Color::srgb(0.8, 0.8, 0.8)),
+            ));
+        });
 }
 
 /// Despawns all serve UI elements when transitioning away from WaitingToServe
-fn despawn_serve_ui(
-    mut commands: Commands,
-    serve_ui_query: Query<Entity, With<ServeUI>>,
-) {
+fn despawn_serve_ui(mut commands: Commands, serve_ui_query: Query<Entity, With<ServeUI>>) {
     for entity in &serve_ui_query {
         commands.entity(entity).despawn();
     }

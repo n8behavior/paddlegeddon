@@ -3,9 +3,9 @@
 use bevy::prelude::*;
 
 use super::{
-    ball::{Ball, spawn_ball, ServeDirection},
-    player::PlayerSide,
     GamePhase,
+    ball::{Ball, ServeDirection, spawn_ball},
+    player::PlayerSide,
 };
 use crate::screens::Screen;
 
@@ -207,16 +207,16 @@ fn handle_goal_and_check_win(
         // Game continues - set up next serve
         // The player who was scored on gets to serve
         serve_direction.side = match goal_event.side {
-            PlayerSide::Left => PlayerSide::Right,  // Left scored, so right serves
-            PlayerSide::Right => PlayerSide::Left,  // Right scored, so left serves
+            PlayerSide::Left => PlayerSide::Right, // Left scored, so right serves
+            PlayerSide::Right => PlayerSide::Left, // Right scored, so left serves
         };
-        
+
         // Spawn new ball (without serving)
         spawn_ball(&mut commands, &mut meshes, &mut materials);
-        
+
         // Transition to goal scored state
         game_phase.set(GamePhase::GoalScored);
-        
+
         // Start the goal timer
         commands.insert_resource(GoalTimer {
             timer: Timer::from_seconds(GOAL_PAUSE_DURATION, TimerMode::Once),
@@ -231,7 +231,7 @@ fn handle_goal_pause(
     mut game_phase: ResMut<NextState<GamePhase>>,
 ) {
     goal_timer.timer.tick(time.delta());
-    
+
     if goal_timer.timer.finished() {
         // Transition to waiting for serve
         game_phase.set(GamePhase::WaitingToServe);
@@ -239,10 +239,7 @@ fn handle_goal_pause(
 }
 
 /// Sets up the game over screen
-fn setup_game_over_screen(
-    mut commands: Commands,
-    score: Res<Score>,
-) {
+fn setup_game_over_screen(mut commands: Commands, score: Res<Score>) {
     let winner = score.winner().expect("Game over without winner");
     let win_type = if (score.left >= MERCY_SCORE && score.right == 0)
         || (score.right >= MERCY_SCORE && score.left == 0)
@@ -251,69 +248,70 @@ fn setup_game_over_screen(
     } else {
         "VICTORY!"
     };
-    
+
     // Game over overlay
-    commands.spawn((
-        Name::new("Game Over Overlay"),
-        Node {
-            width: Val::Percent(100.0),
-            height: Val::Percent(100.0),
-            justify_content: JustifyContent::Center,
-            align_items: AlignItems::Center,
-            flex_direction: FlexDirection::Column,
-            row_gap: Val::Px(20.0),
-            ..default()
-        },
-        BackgroundColor(Color::srgba(0.0, 0.0, 0.0, 0.8)),
-        StateScoped(GamePhase::GameOver),
-    ))
-    .with_children(|parent| {
-        // Win type text
-        parent.spawn((
-            Text::new(win_type),
-            TextFont {
-                font_size: 72.0,
+    commands
+        .spawn((
+            Name::new("Game Over Overlay"),
+            Node {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                justify_content: JustifyContent::Center,
+                align_items: AlignItems::Center,
+                flex_direction: FlexDirection::Column,
+                row_gap: Val::Px(20.0),
                 ..default()
             },
-            TextColor(Color::WHITE),
-        ));
-        
-        // Winner text
-        parent.spawn((
-            Text::new(format!(
-                "{} Player Wins!",
-                match winner {
-                    PlayerSide::Left => "Left",
-                    PlayerSide::Right => "Right",
-                }
-            )),
-            TextFont {
-                font_size: 48.0,
-                ..default()
-            },
-            TextColor(Color::WHITE),
-        ));
-        
-        // Final score
-        parent.spawn((
-            Text::new(format!("Final Score: {} - {}", score.left, score.right)),
-            TextFont {
-                font_size: 36.0,
-                ..default()
-            },
-            TextColor(Color::WHITE),
-        ));
-        
-        // Instructions
-        parent.spawn((
-            Text::new("Press SPACE to play again or ESC for menu"),
-            TextFont {
-                font_size: 24.0,
-                ..default()
-            },
-            TextColor(Color::srgb(0.7, 0.7, 0.7)),
-        ));
-    });
+            BackgroundColor(Color::srgba(0.0, 0.0, 0.0, 0.8)),
+            StateScoped(GamePhase::GameOver),
+        ))
+        .with_children(|parent| {
+            // Win type text
+            parent.spawn((
+                Text::new(win_type),
+                TextFont {
+                    font_size: 72.0,
+                    ..default()
+                },
+                TextColor(Color::WHITE),
+            ));
+
+            // Winner text
+            parent.spawn((
+                Text::new(format!(
+                    "{} Player Wins!",
+                    match winner {
+                        PlayerSide::Left => "Left",
+                        PlayerSide::Right => "Right",
+                    }
+                )),
+                TextFont {
+                    font_size: 48.0,
+                    ..default()
+                },
+                TextColor(Color::WHITE),
+            ));
+
+            // Final score
+            parent.spawn((
+                Text::new(format!("Final Score: {} - {}", score.left, score.right)),
+                TextFont {
+                    font_size: 36.0,
+                    ..default()
+                },
+                TextColor(Color::WHITE),
+            ));
+
+            // Instructions
+            parent.spawn((
+                Text::new("Press SPACE to play again or ESC for menu"),
+                TextFont {
+                    font_size: 24.0,
+                    ..default()
+                },
+                TextColor(Color::srgb(0.7, 0.7, 0.7)),
+            ));
+        });
 }
 
 /// Handles input on the game over screen
