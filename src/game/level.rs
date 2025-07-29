@@ -4,7 +4,7 @@ use bevy::prelude::*;
 
 use crate::{
     asset_tracking::LoadResource,
-    audio::music,
+    //audio::music,
     game::{
         ball::spawn_ball,
         court::spawn_court,
@@ -37,7 +37,7 @@ impl FromWorld for LevelAssets {
 /// A system that spawns the main level.
 pub fn spawn_level(
     mut commands: Commands,
-    level_assets: Res<LevelAssets>,
+    _level_assets: Res<LevelAssets>,
     player_assets: Res<PlayerAssets>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -79,12 +79,13 @@ pub fn spawn_level(
             .id(),
         // Ball
         spawn_ball(&mut commands, &mut meshes, &mut materials),
-        commands
-            .spawn((
-                Name::new("Gameplay Music"),
-                music(level_assets.music.clone()),
-            ))
-            .id(),
+        // TODO: Find some good music
+        //commands
+        //    .spawn((
+        //        Name::new("Gameplay Music"),
+        //        music(level_assets.music.clone()),
+        //    ))
+        //    .id(),
     ];
 
     // Add all children to the level

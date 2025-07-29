@@ -22,9 +22,7 @@ The following items are intentionally suppressed warnings for future features:
 
 1. **`GameLayer::PowerUp` variant** (src/game/physics.rs) - Will be used in
    Phase 2 when implementing power-ups
-2. **`ball_layers()` function** (src/game/physics.rs) - Will be used in Phase
-   1.2 when implementing ball physics
-3. **`powerup_layers()` function** (src/game/physics.rs) - Will be used in
+2. **`powerup_layers()` function** (src/game/physics.rs) - Will be used in
    Phase 2 when implementing power-ups
 
 These items are pre-implemented to establish the collision layer architecture
@@ -40,30 +38,30 @@ early and should not be removed.
 
 ### 1.2 Basic Pong Implementation
 
-- [ ] level
+- [x] level
   - [x] Background (mesh)
   - [x] Court lines (decals)
   - [x] Boundary colliders
-- [ ] Create core components:
-  - [ ] `Ball` component with velocity
+- [x] Create core components:
+  - [x] `Ball` component with velocity
   - [x] `Paddle` component with player assignment
   - [x] `Goal` zones for scoring
-- [ ] Create game systems:
-  - [ ] Ball physics (movement, edge bouncing)
+- [x] Create game systems:
+  - [x] Ball physics (movement, edge bouncing)
   - [x] Paddle movement (keyboard input)
-  - [ ] Collision detection (ball-paddle)
-  - [ ] Scoring system
-- [ ] Add visual assets:
-  - [ ] Simple paddle sprites
-  - [ ] Ball sprite
-  - [ ] Court/arena background
+  - [x] Collision detection (ball-paddle)
+  - [x] Scoring system
+- [x] Add visual assets:
+  - [x] Simple paddle sprites
+  - [x] Ball sprite
+  - [x] Court/arena background
 
 ### 1.3 Game State Management
 
-- [ ] Create `GameState` enum (Playing, Paused, RoundEnd, GameOver)
-- [ ] Implement score tracking resource
-- [ ] Add round restart logic
-- [ ] Integrate with existing pause system
+- [x] Create `GameState` enum (Playing, Paused, RoundEnd, GameOver)
+- [x] Implement score tracking resource
+- [x] Add round restart logic
+- [x] Integrate with existing pause system
 
 ## Phase 2: Power-Up System
 

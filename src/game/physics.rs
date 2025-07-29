@@ -33,7 +33,7 @@ pub const PADDLE_MAX_SPEED: f32 = 400.0;
 /// ## Collision Matrix
 /// ```text
 ///          | Default | Paddle | Ball | Boundary | Goal | PowerUp |
-/// ---------|---------|--------|------|----------|------|---------|  
+/// ---------|---------|--------|------|----------|------|---------|
 /// Default  |   ❌    |   ❌   |  ❌  |    ❌    |  ❌  |   ❌    |
 /// Paddle   |   ❌    |   ❌   |  ✅  |    ✅    |  ❌  |   ❌    |
 /// Ball     |   ❌    |   ✅   |  ❌  |    ✅    |  ✅  |   ✅    |
@@ -61,7 +61,6 @@ pub fn paddle_layers() -> CollisionLayers {
 
 /// Creates collision layers for the ball.
 /// The ball collides with everything.
-#[allow(dead_code)] // Will be used when ball is implemented (Phase 1.2)
 pub fn ball_layers() -> CollisionLayers {
     CollisionLayers::new(
         GameLayer::Ball,
