@@ -34,6 +34,14 @@ pub(super) fn plugin(app: &mut App) {
         .add_systems(
             OnEnter(GamePhase::WaitingToServe), 
             setup_serve_ui.run_if(in_state(Screen::Gameplay))
+        )
+        .add_systems(
+            OnExit(GamePhase::WaitingToServe),
+            despawn_serve_ui
+        )
+        .add_systems(
+            OnEnter(GamePhase::Playing),
+            serve_on_play_start
         );
 }
 
@@ -42,11 +50,15 @@ pub(super) fn plugin(app: &mut App) {
 #[reflect(Component)]
 pub struct Ball;
 
+/// Marker component for serve UI elements
+#[derive(Component)]
+pub struct ServeUI;
+
 /// Tracks which player should serve next
 #[derive(Resource, Default, Reflect)]
 #[reflect(Resource)]
 pub struct ServeDirection {
-    pub side: Option<PlayerSide>,  // None = random, Some = specific side
+    pub side: PlayerSide,
 }
 
 
@@ -91,6 +103,7 @@ pub(super) fn spawn_ball(
         .insert((
             LinearDamping(0.0),
             AngularDamping(0.0),
+            StateScoped(Screen::Gameplay),
         ));
     
     ball_entity
@@ -110,11 +123,10 @@ pub(super) fn serve_ball(
     // Randomly choose up or down
     let angle_sign = if rng.random_bool(0.5) { 1.0 } else { -1.0 };
 
-    // Determine serve direction based on ServeDirection resource
+    // Determine serve direction based on which player is serving
     let direction_x = match serve_direction.side {
-        Some(PlayerSide::Left) => -1.0,  // Serve towards left player
-        Some(PlayerSide::Right) => 1.0,   // Serve towards right player
-        None => if rng.random_bool(0.5) { 1.0 } else { -1.0 }, // Random
+        PlayerSide::Left => 1.0,   // Left player serves to the right
+        PlayerSide::Right => -1.0, // Right player serves to the left
     };
 
     // Convert to radians and calculate velocity components
@@ -128,11 +140,10 @@ pub(super) fn serve_ball(
         .insert(LinearVelocity(Vec2::new(velocity_x, velocity_y)));
 
     info!(
-        "Ball served {} at angle: {:.1}° with velocity: ({:.1}, {:.1})",
+        "{} player served at angle: {:.1}° with velocity: ({:.1}, {:.1})",
         match serve_direction.side {
-            Some(PlayerSide::Left) => "to left player",
-            Some(PlayerSide::Right) => "to right player",
-            None => "randomly",
+            PlayerSide::Left => "Left",
+            PlayerSide::Right => "Right",
         },
         angle_degrees * angle_sign,
         velocity_x,
@@ -140,21 +151,13 @@ pub(super) fn serve_ball(
     );
 }
 
-/// Handles space bar input to serve the ball
+/// Handles space bar input to transition from WaitingToServe to Playing
 fn handle_serve_input(
-    mut commands: Commands,
     keyboard: Res<ButtonInput<KeyCode>>,
-    balls: Query<Entity, With<Ball>>,
-    serve_direction: Res<ServeDirection>,
     mut game_phase: ResMut<NextState<GamePhase>>,
 ) {
     if keyboard.just_pressed(KeyCode::Space) {
-        // Find the ball and serve it
-        for ball_entity in &balls {
-            serve_ball(&mut commands, ball_entity, &serve_direction);
-        }
-        
-        // Transition to playing phase
+        // Transition to playing phase - ball will be served on state entry
         game_phase.set(GamePhase::Playing);
     }
 }
@@ -168,6 +171,7 @@ fn setup_serve_ui(
     // Main container
     commands.spawn((
         Name::new("Serve UI"),
+        ServeUI,
         Node {
             width: Val::Percent(100.0),
             height: Val::Percent(100.0),
@@ -178,26 +182,23 @@ fn setup_serve_ui(
             ..default()
         },
         BackgroundColor(Color::NONE),
-        StateScoped(GamePhase::WaitingToServe),
     ))
     .with_children(|parent| {
         // Serve direction indicator
-        if let Some(side) = serve_direction.side {
-            parent.spawn((
-                Text::new(format!(
-                    "{} player to serve",
-                    match side {
-                        PlayerSide::Left => "Left",
-                        PlayerSide::Right => "Right",
-                    }
-                )),
-                TextFont {
-                    font_size: 32.0,
-                    ..default()
-                },
-                TextColor(Color::WHITE),
-            ));
-        }
+        parent.spawn((
+            Text::new(format!(
+                "{} player to serve",
+                match serve_direction.side {
+                    PlayerSide::Left => "Left",
+                    PlayerSide::Right => "Right",
+                }
+            )),
+            TextFont {
+                font_size: 32.0,
+                ..default()
+            },
+            TextColor(Color::WHITE),
+        ));
         
         // Instructions
         parent.spawn((
@@ -209,4 +210,26 @@ fn setup_serve_ui(
             TextColor(Color::srgb(0.8, 0.8, 0.8)),
         ));
     });
+}
+
+/// Despawns all serve UI elements when transitioning away from WaitingToServe
+fn despawn_serve_ui(
+    mut commands: Commands,
+    serve_ui_query: Query<Entity, With<ServeUI>>,
+) {
+    for entity in &serve_ui_query {
+        commands.entity(entity).despawn();
+    }
+}
+
+/// Serves the ball when entering the Playing state
+fn serve_on_play_start(
+    mut commands: Commands,
+    balls: Query<Entity, With<Ball>>,
+    serve_direction: Res<ServeDirection>,
+) {
+    // Find the ball and serve it
+    for ball_entity in &balls {
+        serve_ball(&mut commands, ball_entity, &serve_direction);
+    }
 }

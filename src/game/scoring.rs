@@ -206,10 +206,10 @@ fn handle_goal_and_check_win(
     } else {
         // Game continues - set up next serve
         // The player who was scored on gets to serve
-        serve_direction.side = Some(match goal_event.side {
+        serve_direction.side = match goal_event.side {
             PlayerSide::Left => PlayerSide::Right,  // Left scored, so right serves
             PlayerSide::Right => PlayerSide::Left,  // Right scored, so left serves
-        });
+        };
         
         // Spawn new ball (without serving)
         spawn_ball(&mut commands, &mut meshes, &mut materials);
