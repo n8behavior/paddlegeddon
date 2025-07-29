@@ -4,7 +4,12 @@ use avian2d::prelude::*;
 use bevy::prelude::*;
 use rand::prelude::*;
 
-use super::physics::ball_layers;
+use super::{
+    physics::ball_layers,
+    player::PlayerSide,
+    GamePhase,
+};
+use crate::screens::Screen;
 
 // Ball properties
 const BALL_RADIUS: f32 = 8.0;
@@ -19,7 +24,17 @@ const MIN_SERVE_ANGLE: f32 = 15.0; // degrees from horizontal
 const MAX_SERVE_ANGLE: f32 = 45.0; // degrees from horizontal
 
 pub(super) fn plugin(app: &mut App) {
-    app.register_type::<Ball>();
+    app.register_type::<Ball>()
+        .register_type::<ServeDirection>()
+        .init_resource::<ServeDirection>()
+        .add_systems(
+            Update,
+            handle_serve_input.run_if(in_state(GamePhase::WaitingToServe).and(in_state(Screen::Gameplay))),
+        )
+        .add_systems(
+            OnEnter(GamePhase::WaitingToServe), 
+            setup_serve_ui.run_if(in_state(Screen::Gameplay))
+        );
 }
 
 /// Marker component for the ball entity
@@ -27,7 +42,15 @@ pub(super) fn plugin(app: &mut App) {
 #[reflect(Component)]
 pub struct Ball;
 
-/// Spawns a ball entity at the center of the court
+/// Tracks which player should serve next
+#[derive(Resource, Default, Reflect)]
+#[reflect(Resource)]
+pub struct ServeDirection {
+    pub side: Option<PlayerSide>,  // None = random, Some = specific side
+}
+
+
+/// Spawns a ball entity at the center of the court (without serving)
 pub(super) fn spawn_ball(
     commands: &mut Commands,
     meshes: &mut ResMut<Assets<Mesh>>,
@@ -52,23 +75,33 @@ pub(super) fn spawn_ball(
             Restitution::new(BALL_RESTITUTION),
             // Prevent rotation for now (can add spin later)
             LockedAxes::ROTATION_LOCKED,
-            // Start with zero velocity - will be set by serve_ball
+            // Start with zero velocity - will be served later
             LinearVelocity::ZERO,
+            // Disable gravity for top-down view
+            GravityScale(0.0),
             // Enable transform interpolation for smooth visual movement
             TransformInterpolation,
             // Enable collision events for goal detection
             CollisionEventsEnabled,
         ))
         .id();
-
-    // Serve the ball immediately after spawning
-    serve_ball(commands, ball_entity);
-
+    
+    // Add damping components separately to avoid tuple size limit
+    commands.entity(ball_entity)
+        .insert((
+            LinearDamping(0.0),
+            AngularDamping(0.0),
+        ));
+    
     ball_entity
 }
 
-/// Applies initial velocity to the ball at a random angle
-fn serve_ball(commands: &mut Commands, ball_entity: Entity) {
+/// Applies initial velocity to the ball based on serve direction
+pub(super) fn serve_ball(
+    commands: &mut Commands,
+    ball_entity: Entity,
+    serve_direction: &ServeDirection,
+) {
     let mut rng = rand::rng();
 
     // Random angle within safe range
@@ -77,8 +110,12 @@ fn serve_ball(commands: &mut Commands, ball_entity: Entity) {
     // Randomly choose up or down
     let angle_sign = if rng.random_bool(0.5) { 1.0 } else { -1.0 };
 
-    // Randomly choose left or right
-    let direction_x = if rng.random_bool(0.5) { 1.0 } else { -1.0 };
+    // Determine serve direction based on ServeDirection resource
+    let direction_x = match serve_direction.side {
+        Some(PlayerSide::Left) => -1.0,  // Serve towards left player
+        Some(PlayerSide::Right) => 1.0,   // Serve towards right player
+        None => if rng.random_bool(0.5) { 1.0 } else { -1.0 }, // Random
+    };
 
     // Convert to radians and calculate velocity components
     let angle_radians = angle_degrees.to_radians() * angle_sign;
@@ -91,9 +128,85 @@ fn serve_ball(commands: &mut Commands, ball_entity: Entity) {
         .insert(LinearVelocity(Vec2::new(velocity_x, velocity_y)));
 
     info!(
-        "Ball served at angle: {:.1}° with velocity: ({:.1}, {:.1})",
+        "Ball served {} at angle: {:.1}° with velocity: ({:.1}, {:.1})",
+        match serve_direction.side {
+            Some(PlayerSide::Left) => "to left player",
+            Some(PlayerSide::Right) => "to right player",
+            None => "randomly",
+        },
         angle_degrees * angle_sign,
         velocity_x,
         velocity_y
     );
+}
+
+/// Handles space bar input to serve the ball
+fn handle_serve_input(
+    mut commands: Commands,
+    keyboard: Res<ButtonInput<KeyCode>>,
+    balls: Query<Entity, With<Ball>>,
+    serve_direction: Res<ServeDirection>,
+    mut game_phase: ResMut<NextState<GamePhase>>,
+) {
+    if keyboard.just_pressed(KeyCode::Space) {
+        // Find the ball and serve it
+        for ball_entity in &balls {
+            serve_ball(&mut commands, ball_entity, &serve_direction);
+        }
+        
+        // Transition to playing phase
+        game_phase.set(GamePhase::Playing);
+    }
+}
+
+
+/// Sets up the serve UI
+fn setup_serve_ui(
+    mut commands: Commands,
+    serve_direction: Res<ServeDirection>,
+) {
+    // Main container
+    commands.spawn((
+        Name::new("Serve UI"),
+        Node {
+            width: Val::Percent(100.0),
+            height: Val::Percent(100.0),
+            justify_content: JustifyContent::Center,
+            align_items: AlignItems::Center,
+            flex_direction: FlexDirection::Column,
+            row_gap: Val::Px(20.0),
+            ..default()
+        },
+        BackgroundColor(Color::NONE),
+        StateScoped(GamePhase::WaitingToServe),
+    ))
+    .with_children(|parent| {
+        // Serve direction indicator
+        if let Some(side) = serve_direction.side {
+            parent.spawn((
+                Text::new(format!(
+                    "{} player to serve",
+                    match side {
+                        PlayerSide::Left => "Left",
+                        PlayerSide::Right => "Right",
+                    }
+                )),
+                TextFont {
+                    font_size: 32.0,
+                    ..default()
+                },
+                TextColor(Color::WHITE),
+            ));
+        }
+        
+        // Instructions
+        parent.spawn((
+            Text::new("Press SPACE to serve"),
+            TextFont {
+                font_size: 24.0,
+                ..default()
+            },
+            TextColor(Color::srgb(0.8, 0.8, 0.8)),
+        ));
+    });
 }

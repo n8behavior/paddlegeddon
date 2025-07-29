@@ -3,16 +3,16 @@
 use avian2d::prelude::*;
 
 // Boundary physics properties
-/// Medium friction for boundaries - allows some sliding along walls
-pub const BOUNDARY_FRICTION: f32 = 0.5;
-/// High restitution for boundaries - creates bouncy walls
-pub const BOUNDARY_RESTITUTION: f32 = 0.8;
+/// Zero friction for boundaries - perfect elastic collision
+pub const BOUNDARY_FRICTION: f32 = 0.0;
+/// Perfect restitution for boundaries - maintains ball velocity
+pub const BOUNDARY_RESTITUTION: f32 = 1.0;
 
 // Paddle physics properties
-/// Low friction for paddles - allows smooth movement
-pub const PADDLE_FRICTION: f32 = 0.1;
-/// Zero restitution for paddles - paddles absorb impact
-pub const PADDLE_RESTITUTION: f32 = 0.0;
+/// Zero friction for paddles - perfect elastic collision
+pub const PADDLE_FRICTION: f32 = 0.0;
+/// Perfect restitution for paddles - maintains ball velocity
+pub const PADDLE_RESTITUTION: f32 = 1.0;
 /// Default maximum speed for paddle movement (pixels per second)
 pub const PADDLE_MAX_SPEED: f32 = 400.0;
 

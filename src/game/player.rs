@@ -63,6 +63,7 @@ pub struct PhysicsBundle {
     friction: Friction,
     restitution: Restitution,
     interpolation: TransformInterpolation,
+    mass: ColliderDensity,
 }
 
 /// The player character.
@@ -114,13 +115,15 @@ pub fn player(
             locked_axes: LockedAxes::new().lock_rotation().lock_translation_x(),
             // Prevent gravity from affecting the paddle
             gravity_scale: GravityScale(0.0),
-            // High linear damping to stop quickly when no input
-            damping: LinearDamping(10.0),
+            // Extremely high linear damping to stop instantly when no input
+            damping: LinearDamping(50.0),
             // Physics material properties for paddles
             friction: Friction::new(PADDLE_FRICTION),
             restitution: Restitution::new(PADDLE_RESTITUTION),
             // Enable transform interpolation for smooth visual movement
             interpolation: TransformInterpolation,
+            // Low density to reduce momentum
+            mass: ColliderDensity(1.0),
         },
         // Input actions
         actions,
